@@ -6,7 +6,7 @@ using namespace geode::prelude;
 
 class $modify(SmartRestartPlayLayer, PlayLayer) {
     void destroyPlayer(PlayerObject * player, GameObject * object) {
-        // Сначала даём GD нормально обработать смерть
+       
         PlayLayer::destroyPlayer(player, object);
 
         if (!player)
@@ -14,32 +14,32 @@ class $modify(SmartRestartPlayLayer, PlayLayer) {
 
         auto mod = Mod::get();
 
-        // Smart Restart выключен
+      
         if (!mod->getSettingValue<bool>("enabled"))
             return;
 
-        // Получаем максимальный процент
+       
         int restartPercent =
             mod->getSettingValue<int>("restart-percent");
 
-        // Смерть произошла слишком поздно
+        
         if (this->getCurrentPercent() > restartPercent)
             return;
 
-        // GD создал стандартный action рестарта
+       
         auto action = this->getActionByTag(0x10);
 
         if (!action)
             return;
 
-        // Убираем стандартную задержку
+       
         this->stopActionByTag(0x10);
 
-        // Получаем нашу задержку
+       
         double delay =
             mod->getSettingValue<double>("restart-delay");
 
-        // Создаём тот же рестарт, но с нашей задержкой
+        
         auto restartAction = CCSequence::create(
             CCDelayTime::create(static_cast<float>(delay)),
             CCCallFunc::create(
@@ -60,6 +60,11 @@ $on_game(Loaded) {
         "toggle-key",
         [](Keybind const&, bool down, bool repeat, double) {
             if (!down || repeat)
+                return;
+
+           
+            auto playLayer = PlayLayer::get();
+            if (!playLayer)
                 return;
 
             auto mod = Mod::get();
